@@ -17,7 +17,7 @@
 
 ##  طريقة التشغيل
 
-1. انسخ الكود الكامل للملف `index.html`
+1. انسخ الكود الكامل للملف `clock.html`
 2. افتحه في أي متصفح حديث (Chrome أو Firefox)
 3. استمتع بالساعة التفاعلية
 
@@ -75,7 +75,7 @@ A modern hybrid **Digital + Analog RGB Clock**, with dynamic gradients, golden d
 
 ##  How to Run
 
-1. Copy all code into a file named `index.html`
+1. Copy all code into a file named `clock.html`
 2. Open it with any modern browser
 3. Enjoy the interactive RGB Clock 
 
