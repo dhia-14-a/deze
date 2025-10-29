@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>ساعة فخمة رقمية وعقارب مزخرفة</title>
+<style>
+/* استيراد خط رقمي أنيق (مثل Orbitron) */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: radial-gradient(circle at center, #000000 0%, #111111 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  /* سيتم التحكم في مؤشر الفأرة (cursor) عبر JavaScript */
+  cursor: default;
+}
+
+/* الساعة والحاوية */
+#clockContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* الساعة الرقمية - تم تغيير الخط */
+#clock {
+  font-family: 'Orbitron', sans-serif; /* خط جديد */
+  font-size: 12vw;
+  font-weight: bold;
+  color: transparent;
+  background-image: linear-gradient(90deg, red, blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15px rgba(255,255,255,0.2), 0 0 25px rgba(255,255,255,0.1);
+}
+
+/* مؤشر ص/م */
+#ampm {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2vw;
+  font-weight: bold;
+  color: gold;
+  margin-top: -3vw; /* رفع المؤشر قليلا */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* التاريخ الذهبي الواضح */
+#date {
+  margin-top: 10px;
+  font-size: 4vw;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(90deg, #FFD700 0%, #FFC700 25%, #FFB800 50%, #FFA500 75%, #FF8C00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerText 2s linear infinite;
+  text-shadow: 0 0 20px rgba(255,215,0,0.9), 0 0 30px rgba(255,215,0,0.6);
+}
+
+@keyframes shimmerText {
+  0% { background-position: 0 0; }
+  50% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* القلم - لم يتغير */
+#pen {
+  position: absolute;
+  right: 2%;
+  bottom: 2%;  
+  width: 12px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(20deg);
+}
+#eraser {
+  width: 12px;
+  height: 8px;
+  background: lightpink;
+  border-radius: 3px 3px 0 0;
+  margin-bottom: 2px;
+  box-shadow: 0 0 4px pink;
+}
+#penBody {
+  width: 12px;
+  flex: 1;
+  border-radius: 6px;
+  background: linear-gradient(to bottom, #FFD700, #FFA500, #FFD700);
+  box-shadow: 0 0 8px gold;
+  animation: shimmer 2s linear infinite;
+}
+#penTip {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 12px solid silver;
+  filter: drop-shadow(0 0 3px white);
+}
+@keyframes shimmer {
+  0% { background-position: 0 0; }
+  50% { background-position: 0 100%; }
+  100% { background-position: 0 0; }
+}
+
+/* زر التحويل المُعدل */
+#toggleBtn {
+  position: absolute;
+  top: 50%;
+  right: 2%;
+  transform: translateY(-50%);
+  width: 45px;
+  height: 45px;
+  font-size: 24px;
+  line-height: 1;
+  font-family: Arial, sans-serif;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  color: black;
+  cursor: pointer;
+  opacity: 0.2; /* الافتراضي شفاف قليلاً */
+  transition: opacity 0.3s, transform 0.2s, box-shadow 0.2s;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#toggleBtn:hover {
+  opacity: 1; /* يصبح مرئياً بالكامل عند التفاعل */
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 20px #FFD700;
+}
+
+/* الساعة العقارب - إضافة تأثير التوهج النابض */
+#analogClock {
+  display: none;
+  width: 30vw;
+  height: 30vw;
+  border-radius: 50%;
+  border: 5px solid gold;
+  background: black;
+  /* إضافة توهج متحرك */
+  box-shadow: 0 0 15px gold; 
+  animation: glowPulse 2s infinite alternate; 
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 15px gold, 0 0 5px rgba(255, 215, 0, 0.3); }
+    100% { box-shadow: 0 0 25px gold, 0 0 15px rgba(255, 215, 0, 0.7); }
+}
+
+/* زر تبديل نظام 12/24 ساعة */
+#timeFormatToggle {
+    position: absolute;
+    bottom: 2%;
+    left: 2%;
+    padding: 8px 15px;
+    font-size: 1.2vw;
+    font-family: 'Orbitron', sans-serif;
+    border: 2px solid gold;
+    border-radius: 5px;
+    background: transparent;
+    color: gold;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+#timeFormatToggle:hover {
+    opacity: 1;
+}
+</style>
+</head>
+<body>
+<div id="clockContainer">
+  <div id="clock">00:00:00</div>
+  <div id="ampm"></div> <div id="date"></div>
+  <canvas id="analogClock"></canvas>
+</div>
+
+<div id="pen">
+  <div id="eraser"></div>
+  <div id="penBody"></div>
+  <div id="penTip"></div>
+</div>
+
+<button id="toggleBtn" title="تحويل بين الرقمي والعقارب"></button>
+
+<button id="timeFormatToggle">24H</button>
+
+<script>
+// --- المتغيرات ---
+let digitalAnimationId = null;
+let analogAnimationId = null;
+let offset = 0;
+let is24HourFormat = true;
+let wakeLock = null; // متغير لتخزين كائن Wake Lock
+
+// --- متغيرات إخفاء المؤشر ---
+let cursorTimer;
+const timeoutDelay = 2000; // 2 ثانية
+
+// جلب العناصر
+const clockDigital = document.getElementById('clock');
+const ampmDisplay = document.getElementById('ampm');
+const analogClock = document.getElementById('analogClock');
+const toggleBtn = document.getElementById('toggleBtn');
+const clockContainer = document.getElementById('clockContainer');
+const timeFormatToggle = document.getElementById('timeFormatToggle');
+const ctx = analogClock.getContext('2d');
+
+// ------------------------------------
+// --- وظائف إخفاء المؤشر ---
+// ------------------------------------
+
+/** إخفاء المؤشر */
+function hideCursor() {
+    document.body.style.cursor = 'none';
+}
+
+/** إعادة تعيين المؤقت وعرض المؤشر */
+function resetCursorTimer() {
+    clearTimeout(cursorTimer);
+    document.body.style.cursor = 'default';
+    // ضبط مؤقت جديد لإخفاء المؤشر بعد فترة عدم حركة
+    cursorTimer = setTimeout(hideCursor, timeoutDelay);
+}
+
+
+// ------------------------------------
+// --- وظائف منع السكون (Wake Lock) ---
+// ------------------------------------
+
+/** طلب قفل التنبيه (منع الشاشة من الإطفاء) */
+async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+        try {
+            // طلب قفل "الشاشة" (screen wake lock)
+            wakeLock = await navigator.wakeLock.request('screen');
+            
+            // إضافة مستمع لطلب القفل مجدداً إذا حرره النظام
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock released by system, requesting again.');
+                requestWakeLock(); // إعادة طلب القفل فوراً
+            });
+            console.log('Wake Lock acquired successfully.');
+        } catch (err) {
+            // تجاهل الأخطاء التي تظهر عند عدم موافقة المستخدم
+            console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+        }
+    } else {
+        console.warn('Wake Lock API not supported.');
+    }
+}
+
+/** تحرير قفل التنبيه */
+function releaseWakeLock() {
+    if (wakeLock) {
+        // إزالة مستمع الحدث قبل التحرير لتجنب حلقة لا نهائية
+        wakeLock.removeEventListener('release', requestWakeLock); 
+        wakeLock.release();
+        wakeLock = null;
+        console.log('Wake Lock released.');
+    }
+}
+
+// ------------------------------------
+// --- وظائف الساعة العادية ---
+// ------------------------------------
+
+// تحديث الساعة الرقمية
+function updateClock() {
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2,'0');
+  const seconds = now.getSeconds().toString().padStart(2,'0');
+  
+  let ampm = '';
+
+  if (!is24HourFormat) {
+    ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // الساعة 0 يجب أن تكون 12
+    ampmDisplay.textContent = ampm;
+    ampmDisplay.style.opacity = 1;
+  } else {
+    ampmDisplay.style.opacity = 0;
+  }
+  
+  const formattedHours = hours.toString().padStart(2,'0');
+  document.getElementById('clock').textContent = `${formattedHours}:${minutes}:${seconds}`;
+
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const dayName = days[now.getDay()];
+  const monthName = months[now.getMonth()];
+  const date = now.getDate();
+  const year = now.getFullYear();
+  document.getElementById('date').textContent = `${dayName} ${date} ${monthName} ${year}`;
+  
+  // تحديث رمز الزر بناءً على الوضع الحالي
+  toggleBtn.textContent = clockDigital.style.display !== 'none' ? '' : '';
+}
+
+// دالة التدرج (مُعدّلة لحفظ المعرّف)
+function animateGradient() {
+  offset = (offset + 1) % 360;
+  document.getElementById('clock').style.backgroundImage =
+    `linear-gradient(${offset}deg, hsl(${offset},100%,50%), hsl(${(offset+180)%360},100%,50%))`;
+  
+  digitalAnimationId = requestAnimationFrame(animateGradient);
+}
+
+// دوال إيقاف الحلقات
+function stopDigitalAnimation() {
+    if (digitalAnimationId) {
+        cancelAnimationFrame(digitalAnimationId);
+        digitalAnimationId = null;
+    }
+}
+function stopAnalogAnimation() {
+    if (analogAnimationId) {
+        cancelAnimationFrame(analogAnimationId);
+        analogAnimationId = null;
+    }
+}
+
+
+// زر تبديل نظام التوقيت
+timeFormatToggle.addEventListener('click', () => {
+    is24HourFormat = !is24HourFormat;
+    timeFormatToggle.textContent = is24HourFormat ? '24H' : '12H';
+    updateClock(); // تحديث فوري
+    if (analogClock.style.display === 'block') {
+        drawAnalogClock(); // لإعادة رسم العقارب إذا كانت معروضة
+    }
+});
+
+
+// --- زر التحويل (يظهر عند اقتراب الماوس من الحافة اليمنى) وتحديث المؤشر ---
+document.body.addEventListener('mousemove', e => {
+  // 1. إعادة تعيين مؤقت المؤشر (يظهر المؤشر ويعيد ضبط المؤقت)
+  resetCursorTimer();
+
+  const clockRect = clockContainer.getBoundingClientRect();
+  const btnRect = toggleBtn.getBoundingClientRect();
+  const windowWidth = window.innerWidth;
+
+  // الشرط الجديد: هل الماوس قريب من الحافة اليمنى؟ (في آخر 70 بكسل)
+  const nearRightEdge = e.clientX > windowWidth - 70;
+  
+  // منطقة الزر الموسعة
+  const nearButton = (
+    e.clientX >= btnRect.left - 20 &&
+    e.clientX <= btnRect.right + 20 &&
+    e.clientY >= btnRect.top - 20 &&
+    e.clientY <= btnRect.bottom + 20
+  );
+
+  // يظهر إذا كان قريبًا من الحافة اليمنى أو قريبًا من موضع الزر نفسه
+  toggleBtn.style.opacity = (nearRightEdge || nearButton) ? 1 : 0.2; 
+});
+
+// التحويل (مُعدّل بالكامل لإدارة الحلقات)
+toggleBtn.addEventListener('click', () => {
+  if(clockDigital.style.display !== 'none') {
+    // التحويل إلى العقارب
+    stopDigitalAnimation();
+    clockDigital.style.display = 'none';
+    ampmDisplay.style.opacity = 0; // إخفاء مؤشر ص/م
+    analogClock.style.display = 'block';
+    setupAnalogClock();
+    drawAnalogClock();
+  } else {
+    // التحويل إلى الرقمية
+    stopAnalogAnimation();
+    analogClock.style.display = 'none';
+    clockDigital.style.display = 'block';
+    animateGradient();
+  }
+  updateClock(); // تحديث النص فوراً
+});
+
+// إعداد canvas بحجم صحيح
+function setupAnalogClock() {
+  analogClock.width = analogClock.offsetWidth;
+  analogClock.height = analogClock.offsetHeight;
+}
+
+// رسم الساعة العقارب
+function drawAnalogClock() {
+  const now = new Date();
+  const radius = analogClock.width / 2;
+
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,analogClock.width,analogClock.height);
+  ctx.translate(radius,radius);
+  ctx.rotate(-Math.PI/2);
+
+  // الدائرة
+  ctx.beginPath();
+  ctx.arc(0,0,radius-5,0,2*Math.PI);
+  ctx.fillStyle = 'black';
+  ctx.fill();
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = 'gold';
+  ctx.stroke();
+
+  let hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  // تعديل الساعات للعقارب بناءً على نظام 12 ساعة
+  if (!is24HourFormat) {
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+  }
+
+  // التدرج RGB للعقارب
+  const grad = ctx.createLinearGradient(-radius,0,radius,0);
+  grad.addColorStop(0, `hsl(${offset},100%,50%)`);
+  grad.addColorStop(1, `hsl(${(offset+180)%360},100%,50%)`);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${radius*0.06}px Arial Black`;
+
+  // عقرب الساعة مزخرف
+  ctx.save();
+  ctx.rotate((Math.PI*2/12)*hours + (Math.PI*2/12)*(minutes/60));
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(0, -radius*0.03);
+  ctx.lineTo(radius*0.5, -radius*0.03);
+  ctx.lineTo(radius*0.5, radius*0.03);
+  ctx.lineTo(0, radius*0.03);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'white';
+  ctx.fillText('ChatGPT', radius*0.25, 0);
+  ctx.restore();
+
+  // عقرب الدقيقة مزخرف
+  ctx.save();
+  ctx.rotate((Math.PI*2/60)*minutes + (Math.PI*2/60)*(seconds/60));
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(0, -radius*0.02);
+  ctx.lineTo(radius*0.7, -radius*0.02);
+  ctx.lineTo(radius*0.7, radius*0.02);
+  ctx.lineTo(0, radius*0.02);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'white';
+  ctx.fillText('ChatGPT', radius*0.35, 0);
+  ctx.restore();
+
+  // عقرب الثانية
+  ctx.save();
+  ctx.rotate((Math.PI*2/60)*seconds);
+  ctx.fillStyle = 'red';
+  ctx.beginPath();
+  ctx.moveTo(0, -radius*0.01);
+  ctx.lineTo(radius*0.9, -radius*0.01);
+  ctx.lineTo(radius*0.9, radius*0.01);
+  ctx.lineTo(0, radius*0.01);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'white';
+  ctx.fillText('ChatGPT', radius*0.45, 0);
+  ctx.restore();
+
+  ctx.rotate(Math.PI/2);
+  ctx.translate(-radius,-radius);
+  offset = (offset+1)%360;
+  
+  analogAnimationId = requestAnimationFrame(drawAnalogClock);
+}
+
+// --- التشغيل الأولي ---
+// طلب قفل التنبيه عند بدء تشغيل الصفحة
+requestWakeLock(); 
+
+timeFormatToggle.textContent = is24HourFormat ? '24H' : '12H';
+setInterval(updateClock,1000);
+updateClock();
+animateGradient(); 
+resetCursorTimer(); // ضبط مؤقت المؤشر عند التحميل الأولي
+
+// تحرير قفل التنبيه عند إغلاق أو مغادرة الصفحة
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        // إذا عاد المستخدم للصفحة، أعد طلب القفل
+        requestWakeLock();
+    } else {
+        // إذا غادر المستخدم الصفحة، حرر القفل
+        releaseWakeLock();
+    }
+});
+</script>
+</body>
+</html>
