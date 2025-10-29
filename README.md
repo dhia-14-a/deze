@@ -27,7 +27,7 @@
 
 > بعد رفع المشروع إلى GitHub، فعّل GitHub Pages من إعدادات المستودع،
 > ثم سيكون رابط المعاينة مثلًا:
-> **https://<اسم_المستخدم>.github.io/Interactive-RGB-Clock/**
+> **https://dhia-14-a.github.io/deze/clock.html**
 
 ---
 
@@ -84,7 +84,7 @@ A modern hybrid **Digital + Analog RGB Clock**, with dynamic gradients, golden d
 ##  Live Preview
 
 After enabling **GitHub Pages**, your live demo will be at:
-**https://<username>.github.io/Interactive-RGB-Clock/**
+**https://dhia-14-a.github.io/deze/clock.html**
 
 ---
 
